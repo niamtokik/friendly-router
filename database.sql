@@ -1,9 +1,15 @@
--- 
+----------------------------------------------------------------------
 -- friendly open-source router database
---
+----------------------------------------------------------------------
 
+-- activate foreign key
+-- see https://www.sqlite.org/foreignkeys.html
 PRAGMA foreign_keys = ON;
+
+-- clean table before add new content
+DROP TABLE IF EXISTS manufacturer_location
 DROP TABLE IF EXISTS manufacturer;
+DROP TABLE IF EXISTS reseller_location;
 DROP TABLE IF EXISTS reseller;
 DROP TABLE IF EXISTS product;
 DROP TABLE IF EXISTS arch;
@@ -14,27 +20,51 @@ DROP TABLE IF EXISTS power;
 DROP TABLE IF EXISTS country;
 DROP TABLE IF EXISTS city;
 
---
+----------------------------------------------------------------------
 -- table country, will contain all
 -- country name.
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS country (
 	  id INTEGER PRIMARY KEY
 	, name TEXT UNIQUE
 );
 
---
+INSERT INTO country(name)
+       VALUES("usa");
+INSERT INTO country(name)
+       VALUES("canada");
+INSERT INTO country(name)
+       VALUES("uk");
+INSERT INTO country(name)
+       VALUES("france");
+INSERT INTO country(name)
+       VALUES("ireland");
+INSERT INTO country(name)
+       VALUES("china");
+INSERT INTO country(name)
+       VALUES("taiwan");
+INSERT INTO country(name)
+       VALUES("japan");
+
+----------------------------------------------------------------------
 -- table city, will contain all city name
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS city (
           id INTEGER PRIMARY KEY
 	, name TEXT UNIQUE
 );
 
---
+INSERT INTO city(name)
+       VALUES("paris");
+INSERT INTO city(name)
+       VALUES("london");
+INSERT INTO city(name)
+       VALUES("tokyo");
+
+----------------------------------------------------------------------
 -- Manufacturers table. Will contain
 -- all manufacturers informations.
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS manufacturer (
 	  id INTEGER PRIMARY KEY
 	, name TEXT UNIQUE
@@ -44,10 +74,10 @@ CREATE TABLE IF NOT EXISTS manufacturer (
 	, google TEXT
 );
 
---
+----------------------------------------------------------------------
 -- Manufacturer location table, will contain
 -- all location informations.
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS manufacturer_location (
           manufacturer_id INTEGER
 	, country_id INTEGER
@@ -61,23 +91,23 @@ CREATE TABLE IF NOT EXISTS manufacturer_location (
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "asus"
 	       , "https://www.asus.com"
-	       , ""
-	       , ""
-	       , "" );
+	       , "https://twitter.com/asus"
+	       , "https://www.facebook.com/ASUS/"
+	       , "https://plus.google.com/+ASUS" );
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "bpi"
 	       , "http://www.banana-pi.org"
-	       , ""
-	       , ""
+	       , "https://twitter.com/bananapiteam"
+	       , "https://www.facebook.com/sinovoipbpi"
 	       , "" );
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "commell"
 	       , "http://www.commell.com.tw"
-	       , ""
-	       , ""
+	       , "https://twitter.com/Taiwan_Commate"
+	       , "https://www.facebook.com/pages/Taiwan-Commate-Computer-Inc/547993955271899"
 	       , "" );
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
-	VALUES ( "cstpic"
+	VALUES ( "cstipc"
 	       , "http://www.cstipc.com"
 	       , ""
 	       , ""
@@ -85,14 +115,14 @@ INSERT INTO manufacturer (name, website, twitter, facebook, google)
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "cz.nic"
 	       , "https://project.turris.cz"
-	       , ""
-	       , ""
+	       , "https://twitter.com/cz_nic"
+	       , "https://www.facebook.com/CZ.NIC"
 	       , "" );
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "gigabyte"
 	       , "http://b2b.gigabyte.com"
-	       , ""
-	       , ""
+	       , "https://twitter.com/gigabyteusa"
+	       , "https://www.facebook.com/GIGABYTE/"
 	       , "" );
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "inctel"
@@ -133,14 +163,14 @@ INSERT INTO manufacturer (name, website, twitter, facebook, google)
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "supermicro"
 	       , "https://www.supermicro.nl"
-	       , ""
+	       , "https://twitter.com/supermicrouk"
 	       , ""
 	       , "" );
 
---
+----------------------------------------------------------------------
 -- Resellers table. Will contain
 -- all resellers informations.
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS reseller (
 	  id INTEGER PRIMARY KEY
 	, name TEXT
@@ -151,10 +181,10 @@ CREATE TABLE IF NOT EXISTS reseller (
 	, google TEXT
 );
 
---
+----------------------------------------------------------------------
 -- Reseller location table. Will contain
 -- address and other info.
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS reseller_location (
           reseller_id INTEGER
 	, country_id INTEGER
@@ -165,10 +195,10 @@ CREATE TABLE IF NOT EXISTS reseller_location (
 	, FOREIGN KEY(city_id) REFERENCES city(id)
 );
 
---
+----------------------------------------------------------------------
 -- OS table. Will contain only
 -- open-source operating systems
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS os (
 	  id INTEGER PRIMARY KEY
 	, name TEXT UNIQUE
@@ -206,10 +236,10 @@ INSERT INTO os (name, link)
 INSERT INTO os (name, link)
        VALUES ("securityrouter", "http://securityrouter.org");
 
---
+----------------------------------------------------------------------
 -- Products table. Will contain
 -- all products with information.
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS product (
 	  id INTEGER PRIMARY KEY
 	, ref TEXT
@@ -409,11 +439,11 @@ INSERT INTO product (ref, link)
        VALUES ( "X11SBA-LN4F"
        	      , "");
 
---
+----------------------------------------------------------------------
 -- arch table will contain specific
 -- archiecture and micro-architecture
 -- processors
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS arch (
 	  id INTEGER PRIMARY KEY
 	, name TEXT 
@@ -427,10 +457,10 @@ INSERT INTO arch (name, value) VALUES ("ARM", 64);
 INSERT INTO arch (name, value) VALUES ("MIPS", 32);
 INSERT INTO arch (name, value) VALUES ("MIPS", 64);
 
---
+----------------------------------------------------------------------
 -- processor table will contain all
 -- processos extra informations.
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS processor (
 	  id INTEGER PRIMARY KEY
 	, name TEXT
@@ -441,9 +471,9 @@ CREATE TABLE IF NOT EXISTS processor (
 	, core INTEGER
 );
 
---
+----------------------------------------------------------------------
 -- memory table
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS memory (
 	  id INTEGER PRIMARY KEY
 	, version TEXT
@@ -453,9 +483,9 @@ CREATE TABLE IF NOT EXISTS memory (
 	, builtin TEXT
 );
 
---
+----------------------------------------------------------------------
 -- netif table
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS netif (
 	  id INTEGER PRIMARY KEY
 	, controler TEXT
@@ -463,16 +493,16 @@ CREATE TABLE IF NOT EXISTS netif (
 	, drivers ID
 );
 
---
+----------------------------------------------------------------------
 -- power table
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS power (
 	  id INTEGER PRIMARY KEY
 );
 
---
+----------------------------------------------------------------------
 -- driver table
---
+----------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS driver (
 	  id INTEGER PRIMARY KEY
 );
