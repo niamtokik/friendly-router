@@ -2,25 +2,39 @@
 # FreeBSD Makefile.
 ######################################################################
 
+TARGET ?= ./_build
+SQLITE_DB := $(TARGET)/db.sqlite
+JSON_DB := $(TARGET)/db.json
+CSV_DB := $(TARGET)/db.csv
+
 all: sqlite json csv
 
-_build:
-	mkdir _build
+console: $(SQLITE_DB)
+	sqlite3 $(SQLITE_DB)
 
-_build/db.sqlite: _build
+$(TARGET):
+	mkdir -p $(TARGET)
+
+$(SQLITE_DB): $(TARGET)
+	@echo debug: generate sqlite database $@
 	sqlite3 $@ < database.sql
 
-_build/db.json: _build
+$(JSON_DB): $(TARGET) 
+	@echo debug: generate json $@
 	@echo "work in progress"
 
-_build/db.csv: _build
+$(CSV_DB): $(TARGET) 
+	@echo debug: generate csv $@
 	@echo "work in progress"
 
-sqlite: _build/db.sqlite
+sqlite: $(SQLITE_DB)
 
-json: _build/db.json
+json: $(JSON_DB)
 
-csv: _build/db.csv
+csv: $(CSV_DB)
 
 clean:
-	rm _build/*
+	-rm $(TARGET)/*
+
+help:
+	@echo "usage: make [sqlite|json|csv|all|console|clean|help]"

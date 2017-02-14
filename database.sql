@@ -14,11 +14,18 @@ DROP TABLE IF EXISTS power;
 DROP TABLE IF EXISTS country;
 DROP TABLE IF EXISTS city;
 
+--
+-- table country, will contain all
+-- country name.
+--
 CREATE TABLE IF NOT EXISTS country (
 	  id INTEGER PRIMARY KEY
 	, name TEXT UNIQUE
 );
 
+--
+-- table city, will contain all city name
+--
 CREATE TABLE IF NOT EXISTS city (
           id INTEGER PRIMARY KEY
 	, name TEXT UNIQUE
@@ -37,6 +44,10 @@ CREATE TABLE IF NOT EXISTS manufacturer (
 	, google TEXT
 );
 
+--
+-- Manufacturer location table, will contain
+-- all location informations.
+--
 CREATE TABLE IF NOT EXISTS manufacturer_location (
           manufacturer_id INTEGER
 	, country_id INTEGER
@@ -140,6 +151,10 @@ CREATE TABLE IF NOT EXISTS reseller (
 	, google TEXT
 );
 
+--
+-- Reseller location table. Will contain
+-- address and other info.
+--
 CREATE TABLE IF NOT EXISTS reseller_location (
           reseller_id INTEGER
 	, country_id INTEGER
@@ -198,11 +213,206 @@ INSERT INTO os (name, link)
 CREATE TABLE IF NOT EXISTS product (
 	  id INTEGER PRIMARY KEY
 	, ref TEXT
-	, link
+	, link TEXT
 );
 
+INSERT INTO product (ref, link)
+       VALUES ( "alix1e"
+       	      , "https://pcengines.ch/alix1e.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "alix2d2"
+       	      , "https://pcengines.ch/alix2d2.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "alix2d3"
+       	      , "https://pcengines.ch/alix2d3.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "alix2d13"
+       	      , "https://pcengines.ch/alix2d13.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "alix3d2"
+       	      , "https://pcengines.ch/alix3d2.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "alix3d3"
+       	      , "https://pcengines.ch/alix3d3.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "alix6f2"
+       	      , "https://pcengines.ch/alix6f2.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "apu"
+       	      , "https://pcengines.ch/apu.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "apu2c0"
+       	      , "https://pcengines.ch/apu2c0.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "apu2c2"
+       	      , "https://pcengines.ch/apu2c2.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "apu2c4"
+       	      , "https://pcengines.ch/apu2c4.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "apu3a2"
+       	      , "https://pcengines.ch/apu3a2.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "apu3a4"
+       	      , "https://pcengines.ch/apu3a4.htm");
+INSERT INTO product (ref, link)
+       VALUES ( "net5501-60"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "net5501-70"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "net6501-30"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "net6501-50"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "net6501-70"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "turris-omnia"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "SYS-5018A-MHN4"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "SYS-5018A-MLHN4"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "SYS-5018A-MHN4"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "SYS-5018A-LTN4"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "SYS-5018A-TN4"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "NF592-Q170"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "JBC153F592"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "JBC153F9HB"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "JBC153F9HG"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "JBC150F592"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "JBC150F59H"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "JBC152F533"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "LE-575"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "LS-574"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "LS-573"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "LE-564"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "GA-9SISL"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "EL-30"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "MS-99A1"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "MS-98H1"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "K-Q77NS"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "K-D56NS"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "K-945GSN"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "BIS-6370"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "banana-pi-r1"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "RTN16"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-M5F"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-M5V"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-M5V_B"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-M2F"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-M8F"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-M9F"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-M9F_B"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-D25SL"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-G41XE"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-H67SL"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-B75SL"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-H87SL_B"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-N70SL"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "ITX-N70SL_B"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "A1SRM-LN5F-2358"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "A1SRM-LN7F-2358"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "A1SRM-LN7F-2758"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "X11SSH-LN4F"
+       	      , "");
+INSERT INTO product (ref, link)
+       VALUES ( "X11SBA-LN4F"
+       	      , "");
+
 --
---
+-- arch table will contain specific
+-- archiecture and micro-architecture
+-- processors
 --
 CREATE TABLE IF NOT EXISTS arch (
 	  id INTEGER PRIMARY KEY
@@ -218,7 +428,8 @@ INSERT INTO arch (name, value) VALUES ("MIPS", 32);
 INSERT INTO arch (name, value) VALUES ("MIPS", 64);
 
 --
---
+-- processor table will contain all
+-- processos extra informations.
 --
 CREATE TABLE IF NOT EXISTS processor (
 	  id INTEGER PRIMARY KEY
@@ -231,7 +442,7 @@ CREATE TABLE IF NOT EXISTS processor (
 );
 
 --
---
+-- memory table
 --
 CREATE TABLE IF NOT EXISTS memory (
 	  id INTEGER PRIMARY KEY
@@ -243,7 +454,7 @@ CREATE TABLE IF NOT EXISTS memory (
 );
 
 --
---
+-- netif table
 --
 CREATE TABLE IF NOT EXISTS netif (
 	  id INTEGER PRIMARY KEY
@@ -253,14 +464,14 @@ CREATE TABLE IF NOT EXISTS netif (
 );
 
 --
---
+-- power table
 --
 CREATE TABLE IF NOT EXISTS power (
 	  id INTEGER PRIMARY KEY
 );
 
 --
---
+-- driver table
 --
 CREATE TABLE IF NOT EXISTS driver (
 	  id INTEGER PRIMARY KEY
