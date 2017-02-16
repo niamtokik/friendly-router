@@ -34,7 +34,8 @@ based on x86, x86_64 (amd64), ARM and MIPS architecture.
  * FreeBSD (pfSense, OpnSense, m0n0wall...)
  * OpenBSD
  * NetBSD
-
+ * https://en.wikipedia.org/wiki/List_of_router_and_firewall_distributions
+ 
 ## History
 
 This project was launched on twitter: 
@@ -51,7 +52,6 @@ https://twitter.com/the_me/status/827421084144263168
  * http://pastebin.com/raw/9tmqhqdV
  * http://pastebin.com/raw/imVt6iig
  * http://pastebin.com/raw/HJxLYBf4
-
 
 ## Links
 
@@ -73,6 +73,18 @@ https://twitter.com/the_me/status/827421084144263168
  * http://www.adlinktech.com/PD/web/PD_detail.php?cKind=&pid=1451&seq=&id=&sid=&utm_source=
  * https://www.supermicro.nl/products/nfo/networking.cfm#BareMetal
  * http://hardwarehell.com/mobo.htm
+ * http://www.bvm.co.uk/
+ * http://www.mini-box.com/AMD-boards
+ * http://bcmcom.com/
+ 
+### Appliance
+
+ * http://www.lannerinc.com/other/products-page
+
+### Unlisted products
+
+ * http://www.bvm.co.uk/ProductDetail.asp?fdProductId=1118
+ * http://www.bvm.co.uk/ProductDetail.asp?fdProductId=1117
 
 ### GNU/Linux Resources
 
