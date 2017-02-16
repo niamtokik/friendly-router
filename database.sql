@@ -1,4 +1,4 @@
-----------------------------------------------------------------------
+b----------------------------------------------------------------------
 -- friendly open-source router database
 ----------------------------------------------------------------------
 
@@ -45,6 +45,8 @@ INSERT INTO country(name)
        VALUES("taiwan");
 INSERT INTO country(name)
        VALUES("japan");
+INSERT INTO country(name)
+       VALUES("switzerland");
 
 ----------------------------------------------------------------------
 -- table city, will contain all city name
@@ -52,6 +54,8 @@ INSERT INTO country(name)
 CREATE TABLE IF NOT EXISTS city (
           id INTEGER PRIMARY KEY
 	, name TEXT UNIQUE
+	, state TEXT 
+	, postal INTEGER
 );
 
 INSERT INTO city(name)
@@ -60,6 +64,8 @@ INSERT INTO city(name)
        VALUES("london");
 INSERT INTO city(name)
        VALUES("tokyo");
+INSERT INTO city(name)
+       VALUES("glattbrugg")
 
 ----------------------------------------------------------------------
 -- Manufacturers table. Will contain
@@ -74,32 +80,20 @@ CREATE TABLE IF NOT EXISTS manufacturer (
 	, google TEXT
 );
 
-----------------------------------------------------------------------
--- Manufacturer location table, will contain
--- all location informations.
-----------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS manufacturer_location (
-          manufacturer_id INTEGER
-	, country_id INTEGER
-	, city_id INTEGER
-	, address TEXT
-	, FOREIGN KEY(manufacturer_id) REFERENCES manufacturer(id)
-	, FOREIGN KEY(country_id) REFERENCES country(id)
-	, FOREIGN KEY(city_id) REFERENCES city(id)
-);
-
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "asus"
 	       , "https://www.asus.com"
 	       , "https://twitter.com/asus"
 	       , "https://www.facebook.com/ASUS/"
-	       , "https://plus.google.com/+ASUS" );
+	       , "https://plus.google.com/+ASUS"
+	       );
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "bpi"
 	       , "http://www.banana-pi.org"
 	       , "https://twitter.com/bananapiteam"
 	       , "https://www.facebook.com/sinovoipbpi"
-	       , "" );
+	       , ""
+	       );
 INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	VALUES ( "commell"
 	       , "http://www.commell.com.tw"
@@ -166,6 +160,37 @@ INSERT INTO manufacturer (name, website, twitter, facebook, google)
 	       , "https://twitter.com/supermicrouk"
 	       , ""
 	       , "" );
+
+----------------------------------------------------------------------
+-- Manufacturer location table, will contain
+-- all location informations.
+----------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS manufacturer_location (
+          manufacturer_id INTEGER
+	, country_id INTEGER
+	, city_id INTEGER
+	, address TEXT
+	, FOREIGN KEY(manufacturer_id) REFERENCES manufacturer(id)
+	, FOREIGN KEY(country_id) REFERENCES country(id)
+	, FOREIGN KEY(city_id) REFERENCES city(id)
+);
+
+INSERT INTO manufacturer_location (manufacturer_id, country_id, city_id, address)
+       VALUES (
+         ((SELECT id FROM manufacturer WHERE name="pcengine"))
+       , ((SELECT id FROM country WHERE name="switzerland"))
+       , ((SELECT id FROM city WHERE name="glattbrugg"))
+       , "Flughofstrasse 58"
+       );
+
+INSERT INTO manufacturer_location (manufacturer_id, country_id, city_id, address)
+       VALUES (
+         ((SELECT id FROM manufacturer WHERE name="soekris"))
+       , ((SELECT id FROM country WHERE name="usa"))
+       , ((SELECT id FROM city WHERE name="scotts valley" AND postalcode="95066"))
+       , "5 Erba Lane, Suite B"
+       );
+
 
 ----------------------------------------------------------------------
 -- Resellers table. Will contain
