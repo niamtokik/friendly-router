@@ -24,12 +24,29 @@
 use strict;
 use warnings;
 
+my $opts = { debug => 1 };
+
+{ package _log;
+  use strict;
+  use warnings;
+
+  sub debug {
+      if ($opts->{debug}) {
+	  my $self = shift();
+	  my $string = shift();
+	  printf(STDERR "debug: %s " . $string . "\n", $self, @_);
+      }
+  }
+  
+  1; }
+
 ######################################################################
 #
 ######################################################################
 { package _wrapper;
   use strict;
   use warnings;
+  use parent -norequire, "_log";
 
   sub new {
       my $class = shift();
@@ -37,14 +54,80 @@ use warnings;
       return bless($self, $class);
   }
 
+  sub recursive {
+      my $self = shift();
+      my $data = shift();
+      $self->type_switch($data, 0);
+  }
+  
+  sub type_switch {
+      my $self = shift();
+      my $ref = shift();
+      my $level = shift();
+      my $type = ref($ref);
+      
+      
+      if ($type eq "HASH") {
+	  $self->hash($ref, $level+1);
+      }
+      
+      elsif ($type eq "ARRAY") {
+	  $self->array($ref, $level);
+      }
+
+      elsif ($type eq "SCALAR") {
+	  # $self->debug("%s", $ref);
+      }
+      
+      else {
+	  # $self->debug("%s", $ref);
+      }
+  }
+
+  sub array {
+      my $self = shift();
+      my $array = shift();
+      my $level = shift();
+      foreach my $item (@$array) {
+	  printf("%s\n", $item);
+	  $self->type_switch($item, $level);
+      }
+      return 0
+  }
+
+  sub hash {
+      my $self = shift();
+      my $hash = shift();
+      my $level = shift();
+      foreach my $key (keys %$hash) {
+	  my $value = $hash->{$key} || "undefined";
+	  printf("%d, %s: %s\n", $level, $key, $value);
+	  $self->type_switch($hash->{$key}, $level);
+      }
+      return 0
+  }
+
+  1; }
+
+{ package _wrapper::valid;
+  use parent -norequire, "_wrapper";
+  
   1; }
 
 { package _wrapper::create;
   use parent -norequire, "_wrapper";
+
   1; }
 
 { package _wrapper::read;
   use parent -norequire, "_wrapper";
+
+  sub all {
+      my $data = shift();
+      my $wrapper = _wrapper->new();
+      $wrapper->recursive($data);
+  }
+  
   1; }
 
 { package _wrapper::update;
@@ -61,12 +144,26 @@ use warnings;
 { package _os;
   1; }
 
+{ package _os::create;
+  use parent -norequire, "_wrapper::create";
+  
+  1; }
+
+######################################################################
+#
+######################################################################
 { package _product;
   1; }
 
+######################################################################
+#
+######################################################################
 { package _reseller;
   1; }
 
+######################################################################
+#
+######################################################################
 { package _manufacturer;
   1; }
 
@@ -87,13 +184,13 @@ use warnings;
   sub return_keys {
       return keys(%$_);
   }
-  
+
   if ($ARGV[0] && -f $ARGV[0]) {
       open(my $fh, "<", $ARGV[0]);
       my @list = Load(join("", <$fh>));
-      print(join("\n", sort map(return_keys,  @list)));
+      close($fh);      
+      _wrapper::read->recursive(\@list);
       print("\n");
-      close($fh);
   }
 
   1; }

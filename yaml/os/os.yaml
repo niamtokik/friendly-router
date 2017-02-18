@@ -8,7 +8,7 @@ openbsd:
 securityrouter:
   website: http://securityrouter.org
   based-on: openbsd
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
@@ -21,21 +21,21 @@ freebsd:
 pfsense:
   website: https://www.pfsense.org
   based-on: freebsd
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 bsdrouter:
   website: http://bsdrp.net
   based-on: freebsd
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 opnsense:
   website: https://www.opnsense.org
   based-on: freebsd
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
@@ -61,48 +61,48 @@ linux:
 alpine:
   website: https://www.alpinelinux.org
   based-on: linux
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 dd-wrt:
   website: https://www.dd-wrt.com
   based-on: linux
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 clearos:
   website: https://www.clearos.com
   based-on: linux
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 ipfire:
   website: http://www.ipfire.org
   based-on: linux
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 iopcop:
   website: http://www.ipcop.org
   based-on: linux
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 smoothwall:
   website: http://www.smoothwall.org
   based-on: linux
-  release: -
+  release:
   resources:
     distrowatch: 
 ---
 vyos: 
   website: https://vyos.io/
   based-on: linux
-  release: -
+  release:
   resources:
     distrowatch: 
