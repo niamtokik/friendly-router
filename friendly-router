@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+######################################################################
+# friendly-router database frontend.
+#
+# --------------------------------------------------------------------
+#
+# this script need:
+#   - YAML (required for database management)
+#   - JSON (required only for JSON converter)
+#   - dbi (required only for SQL converter)
+#
+# --------------------------------------------------------------------
+#
+# future usage description:
+#   friendly-router [create|update|delete] \
+#                   [product|reseller|manufacturer|os] \
+#                   --name Name [--extra-options]
+#   friendly-router validate yaml
+#   friendly-router generate sql
+#   friendly-router generate json
+#
+######################################################################
+
+use strict;
+use warnings;
+
+######################################################################
+#
+######################################################################
+{ package _wrapper;
+  use strict;
+  use warnings;
+
+  sub new {
+      my $class = shift();
+      my $self = { @_ };
+      return bless($self, $class);
+  }
+
+  1; }
+
+{ package _wrapper::create;
+  use parent -norequire, "_wrapper";
+  1; }
+
+{ package _wrapper::read;
+  use parent -norequire, "_wrapper";
+  1; }
+
+{ package _wrapper::update;
+  use parent -norequire, "_wrapper";
+  1; }
+
+{ package _wrapper::delete;
+  use parent -norequire, "_wrapper";
+  1; }
+
+######################################################################
+#
+######################################################################
+{ package _os;
+  1; }
+
+{ package _product;
+  1; }
+
+{ package _reseller;
+  1; }
+
+{ package _manufacturer;
+  1; }
+
+######################################################################
+#
+######################################################################
+{ package _usage;
+  1; }
+
+######################################################################
+#
+######################################################################
+{ package main;
+  use strict;
+  use warnings;
+  use YAML;
+
+  sub return_keys {
+      return keys(%$_);
+  }
+  
+  if ($ARGV[0] && -f $ARGV[0]) {
+      open(my $fh, "<", $ARGV[0]);
+      my @list = Load(join("", <$fh>));
+      print(join("\n", sort map(return_keys,  @list)));
+      print("\n");
+      close($fh);
+  }
+
+  1; }
