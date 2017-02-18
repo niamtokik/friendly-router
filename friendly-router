@@ -65,79 +65,60 @@ my $opts = { debug => 1 };
   # with arity 2: add callback function.
   sub recursive {
       my $self = shift();
-      my $data = shift();
-      my $callback = shift();
-      
-      unless ($callback) {
-	  $self->type_switch($data, 0);
-      }
-      else {
-	  $self->type_switch($data, 0, $callback);
-      }
+      my ($value, $callback, $state) = @_;
+      return $self->type_switch($value, 0, $callback, $state);
   }
 
   # type_switch method route data structure based
   # on their types.
   sub type_switch {
       my $self = shift();
-      my $ref = shift();
-      my $level = shift();
-      my $callback = shift();
-      
-      my $type = ref($ref);
-      if ($type eq "HASH") {
-	  $self->hash($ref, $level+1, $callback);
-      }
-      elsif ($type eq "ARRAY") {
-	  $self->array($ref, $level, $callback);
-      }
-      elsif ($type eq "SCALAR") {
-	  # $self->debug("%s", $ref);
+      my ($value, $level, $callback, $state) = @_;
+      my $type = ref($value);
+
+      if ($type) {
+	  &$callback($value, $level, $state);
+	  $self->$type($value, $level, $callback, $state);
       }
       else {
-	  # $self->debug("%s", $ref);
+	  printf("%s\n", $value);
       }
+      return $state;
   }
 
-  # map action for array type
-  sub array {
+  sub REF {
       my $self = shift();
-      my $array = shift();
-      my $level = shift();
-      my $callback = shift();
+      my ($ref, $level, $callback, $state) = @_;
+      $self->type_switch(\$ref, $level, $callback, $state);
+  }
+  
+  # map action for array type
+  sub ARRAY {
+      my $self = shift();
+      my ($array, $level, $callback, $state) = @_;
       
       foreach my $item (@$array) {
-	  printf("%s\n", $item);
-	  unless($callback) {
-	      $self->type_switch($item, $level);
-	  }
-	  else {
-	      &$callback($item, $level, $callback);
-	      $self->type_switch($item, $level, $callback);
-	  }
+	  $self->type_switch($item, $level, $callback, $state);
       }
       return 0
   }
 
   # map action for hash type
-  sub hash {
+  sub HASH {
       my $self = shift();
-      my $hash = shift();
-      my $level = shift();
-      my $callback = shift();
-      
-      foreach my $key (keys %$hash) {
+      my ($hash, $level, $callback, $state) = @_;
+      my @keys = keys %$hash;
+
+      foreach my $key (@keys) {
 	  my $value = $hash->{$key} || "undefined";
-	  printf("%d, %s: %s\n", $level, $key, $value);
-	  unless ($callback) {
-	      $self->type_switch($hash->{$key}, $level);
-	  }
-	  else {
-	      &$callback($key, $level, $callback);
-	      $self->type_switch($hash->{$key}, $level, $callback);
-	  }
+	  $self->type_switch($value, $level+1, $callback, $state);
       }
       return 0
+  }
+
+  sub SCALAR {
+      my $self = shift();
+      printf("%s\n", join(" ", @_));
   }
 
   1; }
@@ -222,9 +203,14 @@ my $opts = { debug => 1 };
       open(my $fh, "<", $ARGV[0]);
       my @list = Load(join("", <$fh>));
       close($fh);
-      my $callback = sub { printf("callback: %s\n", $_[0]) };
-      _wrapper::read->recursive(\@list, $callback);
-      print("\n");
+      my $callback = sub {
+	  my ($value, $value, $state) = @_;
+	  # printf("callback: %s\n", $_[0]);
+	  $$state++;
+      };
+      my $state = 0;
+      my $t = _wrapper::read->recursive(\@list, $callback, \$state);
+      printf("%s\n", $$t);
   }
 
   1; }
