@@ -86,7 +86,7 @@ https://twitter.com/the_me/status/827421084144263168
  * http://www.bvm.co.uk/ProductDetail.asp?fdProductId=1118
  * http://www.bvm.co.uk/ProductDetail.asp?fdProductId=1117
 
-### GNU/Linux Resources
+## GNU/Linux Resources
 
  * http://www.linux-drivers.org/
  * https://www.linuxjournal.com/supportedhardware
