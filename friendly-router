@@ -51,13 +51,15 @@ my $opts = { debug => 1 };
 { package _wrapper;
   use strict;
   use warnings;
+  use YAML;
   use parent -norequire, "_log";
 
   # simple constructor
   sub new {
       my $class = shift();
       my $self = { @_ };
-      return bless($self, $class);
+      bless($self, $class);
+      return $self;
   }
 
   # this method is the recursive API.
@@ -120,48 +122,43 @@ my $opts = { debug => 1 };
       my $self = shift();
       printf("%s\n", join(" ", @_));
   }
-
-  1; }
-
-{ package _wrapper::valid;
-  use parent -norequire, "_wrapper";
   
-  1; }
-
-{ package _wrapper::create;
-  use parent -norequire, "_wrapper";
-
-  1; }
-
-{ package _wrapper::read;
-  use parent -norequire, "_wrapper";
-
-  sub all {
-      my $data = shift();
-      my $wrapper = _wrapper->new();
-      $wrapper->recursive($data);
+  sub load_template {
+      my $self = shift();
+      my $template = Load($self->{template});
   }
+
   
-  1; }
-
-{ package _wrapper::update;
-  use parent -norequire, "_wrapper";
-  1; }
-
-{ package _wrapper::delete;
-  use parent -norequire, "_wrapper";
   1; }
 
 ######################################################################
 #
 ######################################################################
 { package _os;
-  1; }
 
-{ package _os::create;
-  use parent -norequire, "_wrapper::create";
+  sub new {
+      my $class = shift();
+      my $self = {};
+      bless($self, $class);
+      $self->load_template();
+      return $self;
+  }
+  
+  sub load_template {
+      my $self = shift();
+      my $template = "./yaml/os.template";
+      $self->{template} = Load($template);
+      return $self;
+  }
+  
+  sub create {
+      my $self = shift();
+      
+      
+  }
   
   1; }
+
 
 ######################################################################
 #
@@ -184,7 +181,155 @@ my $opts = { debug => 1 };
 ######################################################################
 #
 ######################################################################
+{ package _database;
+  use strict;
+  use warnings;
+  use YAML;
+    
+  1; }
+
+{ package _fsm;
+  use strict;
+  use warnings;
+  use parent -norequire, "_log";
+  
+  sub new {
+      my $class = shift();
+      my $origin = shift();
+      my $callback = shift();
+      my $self = { };
+      bless($self, $class);
+      return $self->set_data($origin)->set_callback($callback);
+  }
+
+  sub set_data {
+      my $self = shift();
+      my $data = shift() || 0;
+      $self->{origin} = $data;
+      return $self;
+  }
+  
+  sub set_callback {
+      my $self = shift();
+      my $callback = shift() || 0;
+      $self->{callback} = $callback;
+      return $self;
+  }
+
+  sub callback {
+      my $self = shift();
+      my $callback = $self->{callback};
+      if ($callback) {
+	  return &$callback(@_);
+      }
+      return ();
+  }
+  
+  sub parse {
+      my $self = shift();
+      my $data = shift() || $self->{origin} or
+	  die("no datastructure set.");
+      
+      my $ret = $self->router($data, @_);
+      return $self;
+  }
+
+  sub router {
+      my $self = shift();
+      my $data = shift();
+      my $ref = ref($data);
+      
+      if ($ref) {
+	  $self->router_branch($ref, $data, @_);
+      }
+      else {
+	  $self->router_leaf("LEAF", $data, @_);
+      }
+  }
+
+  sub router_branch {
+      my $self = shift();
+      my $ref = shift();
+      my $data = shift();
+      
+      my @retcall = $self->callback($ref, $data, @_);
+      
+      if (@retcall) {
+	  $self->$ref(@retcall);
+      }
+      else {
+	  $self->$ref($data, @_);
+      }
+  }
+  
+  sub router_leaf {
+      my $self = shift();
+      my $ref = shift();
+      my $data = shift();
+      return $self->callback($ref, $data, @_);
+  }
+  
+  sub SCALAR {
+      my $self = shift();
+      my $data = shift();
+      
+      $self->debug("scalar: %s", $data);
+      $self->router($data, @_);
+  }
+  
+  sub HASH {
+      my $self = shift();
+      my $data = shift();
+
+      my @keys = keys(%$data);
+      foreach my $key (@keys) {
+	  my $value = $data->{$key};
+	  $self->debug("hash: %s -> %s", $key, $value);
+	  $self->router($value, @_);
+      }
+  }
+  
+  sub ARRAY {
+      my $self = shift();
+      my $data = shift();
+      my $limit = scalar(@$data);
+      
+      foreach my $position (0..$limit) {
+	  my $value = $data->[$position];
+	  $self->router($value, @_);
+      }
+  }
+  
+  sub REF {
+      my $self = shift();
+      my $data = shift();
+      
+      $self->debug("ref: %s", $data);
+      $self->router($$data, @_);
+  }
+  
+  sub CODE {
+      my $self = shift();
+      my $data = $self;
+      
+      $self->debug("code: %s", $data);
+  }
+  
+  sub GLOB {
+      my $self = shift();
+      my $data = shift();
+      
+      $self->debug("glob: %s", <$data>);
+      $self->router(<$data>, @_);
+  }
+    
+  1; }
+
+######################################################################
+#
+######################################################################
 { package _usage;
+  
   1; }
 
 ######################################################################
@@ -198,19 +343,11 @@ my $opts = { debug => 1 };
   sub return_keys {
       return keys(%$_);
   }
-
-  if ($ARGV[0] && -f $ARGV[0]) {
-      open(my $fh, "<", $ARGV[0]);
-      my @list = Load(join("", <$fh>));
-      close($fh);
-      my $callback = sub {
-	  my ($value, $value, $state) = @_;
-	  # printf("callback: %s\n", $_[0]);
-	  $$state++;
-      };
-      my $state = 0;
-      my $t = _wrapper::read->recursive(\@list, $callback, \$state);
-      printf("%s\n", $$t);
-  }
-
+  
+  open(my $fd, "<", "./yaml/os/os.yaml");
+  my $yaml = join("", <$fd>);
+  my @data = Load($yaml);
+  my $fsm = _fsm->new(\@data)->parse();
+  close($fd);  
+  
   1; }
