@@ -1,0 +1,35 @@
+{{name}}:
+  manufacturer: {{manufacturer}
+  reseller:
+    {{for reseller in resellers}}
+    - {{reseller}}
+    {{endfor}}
+  feature:
+    processor:
+      manufacturer: {{processor_manufacturer}}
+      model: {{processor_model}}
+      architecture: {{processor_architecture}}
+      frequency: {{processor_frequency}}
+      core: {{processor_core}}
+      thread: {{processor_thread}}
+    memory: 
+      built-in: {{memory_builtin}}
+      min: {{memory_min}}
+      max: {{memory_max}}
+      manufacturer: {{memory_manufacturer}}
+      type: {{memory_type}}
+      frequency: {{memory_frequency}}
+    network:
+      interface: {{network_interface}}
+      {{for interface in interfaces}}
+      {{interface.name}}:
+        manufacturer: {{interface.manufacturer}}
+        media: 
+          {{for media in interface.media}}
+          - {{media}}
+          {{endfor}}
+      {{endfor}}
+  os:
+    {{for os in oss}}
+    - {{os}} 
+    {{endfor}}
