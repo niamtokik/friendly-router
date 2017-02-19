@@ -59,102 +59,47 @@ my $opts = { debug => 1 };
       my $class = shift();
       my $self = { @_ };
       bless($self, $class);
+      return $self->init();
+  }
+
+  sub set_template {
+      my $self = shift();
+      my $template = shift();
+      $self->{template_file} = $template;
       return $self;
-  }
-
-  # this method is the recursive API.
-  # with arity 1: only navigate throught datastructure
-  # with arity 2: add callback function.
-  sub recursive {
-      my $self = shift();
-      my ($value, $callback, $state) = @_;
-      return $self->type_switch($value, 0, $callback, $state);
-  }
-
-  # type_switch method route data structure based
-  # on their types.
-  sub type_switch {
-      my $self = shift();
-      my ($value, $level, $callback, $state) = @_;
-      my $type = ref($value);
-
-      if ($type) {
-	  &$callback($value, $level, $state);
-	  $self->$type($value, $level, $callback, $state);
-      }
-      else {
-	  printf("%s\n", $value);
-      }
-      return $state;
-  }
-
-  sub REF {
-      my $self = shift();
-      my ($ref, $level, $callback, $state) = @_;
-      $self->type_switch(\$ref, $level, $callback, $state);
-  }
-  
-  # map action for array type
-  sub ARRAY {
-      my $self = shift();
-      my ($array, $level, $callback, $state) = @_;
-      
-      foreach my $item (@$array) {
-	  $self->type_switch($item, $level, $callback, $state);
-      }
-      return 0
-  }
-
-  # map action for hash type
-  sub HASH {
-      my $self = shift();
-      my ($hash, $level, $callback, $state) = @_;
-      my @keys = keys %$hash;
-
-      foreach my $key (@keys) {
-	  my $value = $hash->{$key} || "undefined";
-	  $self->type_switch($value, $level+1, $callback, $state);
-      }
-      return 0
-  }
-
-  sub SCALAR {
-      my $self = shift();
-      printf("%s\n", join(" ", @_));
   }
   
   sub load_template {
       my $self = shift();
-      my $template = Load($self->{template});
+      
+      if (-f $self->{template_file}) {
+	  open(my $fd, "<", $self->{template_file});
+	  my $yaml = join("", <$fd>);
+	  close($fd);
+	  my $data = Load($yaml);
+	  $self->{template} = $data;
+      }
+      return $self;
   }
 
-  
+  sub print_template {
+      my $self = shift();
+      my $data = $self->{template};
+      _fsm->new(\$data)->parse();
+  }
+
   1; }
 
 ######################################################################
 #
 ######################################################################
 { package _os;
-
-  sub new {
-      my $class = shift();
-      my $self = {};
-      bless($self, $class);
-      $self->load_template();
-      return $self;
-  }
+  use parent -norequire, "_wrapper";
   
-  sub load_template {
+  sub init {
       my $self = shift();
-      my $template = "./yaml/os.template";
-      $self->{template} = Load($template);
+      $self->set_template("./yaml/os.template");
       return $self;
-  }
-  
-  sub create {
-      my $self = shift();
-      
-      
   }
   
   1; }
@@ -164,18 +109,42 @@ my $opts = { debug => 1 };
 #
 ######################################################################
 { package _product;
+  use parent -norequire, "_wrapper";
+  
+  sub init {
+      my $self = shift();
+      $self->set_template("./yaml/product.template");
+      return $self;
+  }
+
   1; }
 
 ######################################################################
 #
 ######################################################################
 { package _reseller;
+  use parent -norequire, "_wrapper";
+  
+  sub init {
+      my $self = shift();
+      $self->set_template("./yaml/reseller.template");
+      return $self;
+  }
+
   1; }
 
 ######################################################################
 #
 ######################################################################
 { package _manufacturer;
+  use parent -norequire, "_wrapper";
+  
+  sub init {
+      my $self = shift();
+      $self->set_template("./yaml/manufacturer.template");
+      return $self;
+  }
+
   1; }
 
 ######################################################################
@@ -188,11 +157,15 @@ my $opts = { debug => 1 };
     
   1; }
 
+######################################################################
+#
+######################################################################
 { package _fsm;
   use strict;
   use warnings;
   use parent -norequire, "_log";
-  
+
+  # constructor
   sub new {
       my $class = shift();
       my $origin = shift();
@@ -202,13 +175,15 @@ my $opts = { debug => 1 };
       return $self->set_data($origin)->set_callback($callback);
   }
 
+  # set data as origin.
   sub set_data {
       my $self = shift();
       my $data = shift() || 0;
       $self->{origin} = $data;
       return $self;
   }
-  
+
+  # set callback called before routing
   sub set_callback {
       my $self = shift();
       my $callback = shift() || 0;
@@ -216,6 +191,7 @@ my $opts = { debug => 1 };
       return $self;
   }
 
+  # callback validation
   sub callback {
       my $self = shift();
       my $callback = $self->{callback};
@@ -224,7 +200,8 @@ my $opts = { debug => 1 };
       }
       return ();
   }
-  
+
+  # main parse function
   sub parse {
       my $self = shift();
       my $data = shift() || $self->{origin} or
@@ -234,6 +211,7 @@ my $opts = { debug => 1 };
       return $self;
   }
 
+  # router function based on reference
   sub router {
       my $self = shift();
       my $data = shift();
@@ -247,6 +225,7 @@ my $opts = { debug => 1 };
       }
   }
 
+  # branch router, if its hash, array or ref
   sub router_branch {
       my $self = shift();
       my $ref = shift();
@@ -261,7 +240,8 @@ my $opts = { debug => 1 };
 	  $self->$ref($data, @_);
       }
   }
-  
+
+  # leaf router, last value.
   sub router_leaf {
       my $self = shift();
       my $ref = shift();
