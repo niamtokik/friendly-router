@@ -165,22 +165,49 @@ my $opts = { debug => 1 };
 ######################################################################
 #
 ######################################################################
+=head2 _fsm package
+
+_fsm package is used to parse data from YAML configuration file and
+execute callback to set undefined value. 
+
+=cut
 { package _fsm;
   use strict;
   use warnings;
   use parent -norequire, "_log";
 
-  # constructor
+=head3 API:  _fms::new constructor
+
+If you want to instanciate an _fsm object, you'll need to use this 
+constructor.
+
+  my $fsm = _fsm->new();
+
+constructor can take 1 or 2 arguments. First arguments is a reference
+to yaml decoded data, the second is the callback. If you don't have
+set yet, you can set it later.
+
+  my $fsm = _fsm->new(\$yaml, sub {});
+
+=cut      
   sub new {
       my $class = shift();
       my $origin = shift();
       my $callback = shift();
       my $self = { };
       bless($self, $class);
-      return $self->set_data($origin)->set_callback($callback);
+      return $self->set_data($origin)
+	  ->set_callback($callback)
+	  ->reset_callback_state();
   }
 
-  # set data as origin.
+=head3 API: _fsm::set_data accessor
+
+This method set yaml data. You can chain it after constructor
+
+  my $fsm = _fsm->new()->set_data(\$data);
+
+=cut
   sub set_data {
       my $self = shift();
       my $data = shift() || 0;
@@ -188,7 +215,14 @@ my $opts = { debug => 1 };
       return $self;
   }
 
-  # set callback called before routing
+  
+=head3 API: _fsm::set_callback accessor
+
+This method allow to set callback after object creation.
+
+  my $fsm = _fsm->new(\$data)->set_callback(sub {});
+
+=cut
   sub set_callback {
       my $self = shift();
       my $callback = shift() || 0;
@@ -196,17 +230,68 @@ my $opts = { debug => 1 };
       return $self;
   }
 
+=head3 Internal: _fsm::callback accessor
+
+This method is used internaly and permit to check and valid
+if callback function is set and pass it default argument.
+
+=cut
   # callback validation
   sub callback {
       my $self = shift();
       my $callback = $self->{callback};
+      my $callback_state = $self->{callback_state};
+      
       if ($callback) {
-	  return &$callback(@_);
+	  return &$callback($callback_state, @_);
       }
       return ();
   }
 
-  # main parse function
+=head3 Internal: _fsm::set_callback_state
+
+This method is used to push data into state. Currently, 
+callback state is a simple reference to an array, due
+to this datastructure, we can follow all execution path.
+
+=cut
+  sub set_callback_state {
+      my $self = shift();
+      my $data = shift();
+      my $callback_state = $self->{callback_state};
+      push(@$callback_state, $data);
+      return $self;
+  }
+
+=head3 Internal: _fsm::get_callback_state
+
+Return current callback state.
+
+=cut
+  sub get_callback_state {
+      my $self = shift();
+      return $self->{callback_state};
+  }
+  
+=head3 Internal: _fsm::reset_callback_state
+
+Reset current callback state, create new empty array and
+share its reference into callback_state attribute.
+
+=cut
+  sub reset_callback_state {
+      my $self = shift();
+      my $callback_state = $self->{callback_state};
+      my @state = ();
+      $self->{callback_state} = \@state;
+      return $self;
+  }
+  
+=head3 API: _fsm::parse
+
+parse recursively our yaml datastructure.
+
+=cut
   sub parse {
       my $self = shift();
       my $data = shift() || $self->{origin} or
@@ -216,7 +301,14 @@ my $opts = { debug => 1 };
       return $self;
   }
 
-  # router function based on reference
+=head3 Internal: _fsm::router
+
+router function will check if data is a reference and route
+this data to appropriate function named with reference. if you
+pass an hash or an array, reference will be HASH or ARRAY,
+methods _fsm::HASH or _fsm::ARRAY will be executed.
+
+=cut
   sub router {
       my $self = shift();
       my $data = shift();
@@ -225,6 +317,8 @@ my $opts = { debug => 1 };
       return $self->$ref($data, @_);
   }
 
+=head3 Internal callback: _fsm::$REF
+=cut
   sub SCALAR {
       my $self = shift();
       my $data = shift();
@@ -241,7 +335,8 @@ my $opts = { debug => 1 };
       foreach my $key (@keys) {
 	  my $value = $data->{$key};
 	  $self->debug("hash: %s -> %s", $key, $value);
-	  $self->callback("HASH", $data, $key);
+	  $self->set_callback_state($data);
+	  $self->callback($data, $key);
 	  $self->router($value, @_);
       }
   }
@@ -251,7 +346,8 @@ my $opts = { debug => 1 };
       my $data = shift();
       
       foreach my $item (@$data) {
-	  $self->callback("ARRAY", $data, $item);
+	  $self->set_callback_state($data);
+	  $self->callback($data, $item);
 	  $self->router($item, @_);
       }
   }
@@ -261,6 +357,7 @@ my $opts = { debug => 1 };
       my $data = shift();
       
       $self->debug("ref: %s", $data);
+      $self->set_callback_state($data);
       $self->router($$data, @_);
   }
   
@@ -269,6 +366,7 @@ my $opts = { debug => 1 };
       my $data = $self;
       
       $self->debug("code: %s", $data);
+      $self->set_callback_state($data);
   }
   
   sub GLOB {
@@ -276,12 +374,18 @@ my $opts = { debug => 1 };
       my $data = shift();
       
       $self->debug("glob: %s", <$data>);
+      
+      $self->set_callback_state($data);
+      $self->callback($data, @_);
       $self->router(<$data>, @_);
   }
 
   sub LEAF {
       my $self = shift();
-      $self->callback("LEAF", @_);
+      my $data = shift();
+      $self->set_callback_state($data);
+      $self->callback($data, @_);
+      $self->reset_callback_state();
       return @_;
   }
     
@@ -313,7 +417,7 @@ my $opts = { debug => 1 };
 		      sub {
 			  my $ref = shift();
 			  my $data = shift();
-			  printf("callback %s, %s\n", $ref, $data);
+			  printf("callback %s\n", join(" ", @$ref));
 			  return $data, @_;
 		      }
       )->parse();
