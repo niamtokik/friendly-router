@@ -24,7 +24,7 @@
 use strict;
 use warnings;
 
-my $opts = { debug => 1 };
+my $opts = { debug => 0 };
 
 ######################################################################
 # log package, share accross all object, contain default logging
@@ -336,7 +336,7 @@ methods _fsm::HASH or _fsm::ARRAY will be executed.
 	  my $value = $data->{$key};
 	  $self->debug("hash: %s -> %s", $key, $value);
 	  $self->set_callback_state($data);
-	  $self->callback($data, $key);
+	  $self->callback($data, $key, $value);
 	  $self->router($value, @_);
       }
   }
@@ -344,11 +344,13 @@ methods _fsm::HASH or _fsm::ARRAY will be executed.
   sub ARRAY {
       my $self = shift();
       my $data = shift();
+      my $limit = scalar($data);
       
-      foreach my $item (@$data) {
+      foreach my $position (0..@$limit) {
+	  my $value = $data->[$position];
 	  $self->set_callback_state($data);
-	  $self->callback($data, $item);
-	  $self->router($item, @_);
+	  $self->callback($data, $position);
+	  $self->router($value, @_);
       }
   }
   
@@ -415,10 +417,20 @@ methods _fsm::HASH or _fsm::ARRAY will be executed.
   my @data = Load($yaml);
   my $fsm = _fsm->new(\@data,
 		      sub {
-			  my $ref = shift();
+			  my $state = shift();
 			  my $data = shift();
-			  printf("callback %s\n", join(" ", @$ref));
-			  return $data, @_;
+			  my $ref = ref($data);
+			  printf("state: %s\n", join(" ", @$state));
+			  if ($ref eq "HASH") {
+			      my $hash = shift();
+			      my $key = shift();
+			      my $value = shift();
+			      if ($key eq "ddr") {
+				  $hash->{$key} = "prout";
+			      }
+			      printf("\tcallback: %s %s %s\n",
+				     $data, $hash, $key);
+			  }
 		      }
       )->parse();
   close($fd);  
