@@ -1,0 +1,5 @@
+module github.com/niamtokik/friendly-router
+
+go 1.13
+
+require github.com/aws/aws-sdk-go v1.29.11
