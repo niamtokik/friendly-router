@@ -1,0 +1,108 @@
+---
+openbsd:
+  website: https://www.openbsd.org
+  release: 6.0
+  resources:
+    distrowatch: 
+---
+securityrouter:
+  website: http://securityrouter.org
+  based-on: openbsd
+  release:
+  resources:
+    distrowatch: 
+---
+freebsd:
+  website: https://www.freebsd.org
+  release: 11.0
+  resources:
+    distrowatch: 
+---
+pfsense:
+  website: https://www.pfsense.org
+  based-on: freebsd
+  release:
+  resources:
+    distrowatch: 
+---
+bsdrouter:
+  website: http://bsdrp.net
+  based-on: freebsd
+  release:
+  resources:
+    distrowatch: 
+---
+opnsense:
+  website: https://www.opnsense.org
+  based-on: freebsd
+  release:
+  resources:
+    distrowatch: 
+---
+m0n0wall:
+  website: http://m0n0.ch/wall
+  based-on: freebsd
+  release: unmaintened
+  resources:
+    distrowatch: 
+---
+netbsd:
+  website: https://www.netbsd.org
+  release: 7.0
+  resources:
+    distrowatch: 
+---
+linux:
+  website: https://www.kernel.org
+  release: 4.9
+  resources:
+    distrowatch: 
+---
+alpine:
+  website: https://www.alpinelinux.org
+  based-on: linux
+  release:
+  resources:
+    distrowatch: 
+---
+dd-wrt:
+  website: https://www.dd-wrt.com
+  based-on: linux
+  release:
+  resources:
+    distrowatch: 
+---
+clearos:
+  website: https://www.clearos.com
+  based-on: linux
+  release:
+  resources:
+    distrowatch: 
+---
+ipfire:
+  website: http://www.ipfire.org
+  based-on: linux
+  release:
+  resources:
+    distrowatch: 
+---
+iopcop:
+  website: http://www.ipcop.org
+  based-on: linux
+  release:
+  resources:
+    distrowatch: 
+---
+smoothwall:
+  website: http://www.smoothwall.org
+  based-on: linux
+  release:
+  resources:
+    distrowatch: 
+---
+vyos: 
+  website: https://vyos.io/
+  based-on: linux
+  release:
+  resources:
+    distrowatch: 

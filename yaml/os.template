@@ -1,0 +1,6 @@
+{{name}}:
+  website: {{website}}
+  based-on: {{based}}
+  release: {{release}
+  resources:
+    distrowatch: {{distrowatch}}

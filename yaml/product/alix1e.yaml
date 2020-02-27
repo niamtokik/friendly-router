@@ -1,0 +1,35 @@
+alix1e:
+  manufacturer: pcengine
+  reseller:
+    - reseller-list-here
+  feature:
+    processor:
+      manufacturer: amd
+      model: geode-lx
+      architecture: x86 
+      frequency: 500Mhz
+      core: 0
+      thread: -
+    memory: 
+      built-in: 256
+      min: 128
+      max: 512
+      manufacturer: -
+      type: ddr
+      frequency: -
+    network:
+      interface: 2
+      vt6105:
+        manufacturer: via
+        media: 
+          - "10baseTX"
+          - "100baseTX"
+    storage:
+      sata:
+    power:
+      power: 12W
+  os:
+    - openbsd
+    - freebsd 
+    - netbsd 
+    - linux

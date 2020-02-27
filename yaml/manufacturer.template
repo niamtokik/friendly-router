@@ -1,0 +1,13 @@
+{{name}}:
+  website: {{website}}
+  location:
+    country: {{country}}
+    state: {{state}}
+    city: {{city}}
+    postcode: {{postcode}}
+    address: {{address}}
+  contact:
+    twitter: {{twitter}}
+    linkedin: {{linkedin}}
+    google: {{google}}
+    facebook: {{facebook}}
