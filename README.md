@@ -107,7 +107,7 @@ https://twitter.com/the_me/status/827421084144263168
  * https://www.openbsd.org/amd64.html
  * https://www.openbsd.org/i386.html
 
-### NetBSD
+### NetBSD
 
  * http://www.netbsd.org/Hardware/
  * http://www.netbsd.org/Ports/i386/hardware.html

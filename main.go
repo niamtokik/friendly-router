@@ -61,6 +61,8 @@ func checkDatabase(client *dynamodb.DynamoDB) {
 	createDatabase(client)
 }
 
+
+
 // main function
 func main() {
 	mux := http.NewServeMux()
